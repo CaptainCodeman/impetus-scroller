@@ -1,0 +1,211 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<script src="impetus.min.js"></script>
+
+<!--
+`impetus-scroller`
+Momentum scroller using impetus
+
+@demo demo/index.html 
+-->
+
+<dom-module id="impetus-scroller">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        overflow: hidden;
+        contain: content;
+      }
+
+      #container {
+        position: absolute;
+        transform-origin: 0 0;
+        will-change: transform;
+      }
+
+      #container[loading] ::slotted(*) {
+        transition: none !important;
+        visibility: hidden;
+        display: none;
+      }
+
+      #container ::slotted(*) {
+        position: absolute;
+        transform-origin: 0 0;
+        will-change: transform;
+      }
+    </style>
+    <div id="container"><content id="content"></content></div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'impetus-scroller',
+
+      behaviors: [
+        Polymer.IronResizableBehavior
+      ],
+
+      properties: {
+        spacing: {
+          type: Number,
+          value: 1
+        },
+
+        friction: {
+          type: Number,
+          value: 0.96
+        },
+
+        /* loading flag for initial render */
+        loading: {
+          type: Boolean,
+          value: true,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        x: {
+          type: Number,
+          value: 0
+        },
+
+        _width: {
+          type: Number
+        },
+
+        _height: {
+          type: Number
+        },
+
+        _elements: {
+          type: Array
+        },
+
+        _dimensions: {
+          type: Array,
+          computed: '_computeDimensions(_elements)'
+        },
+
+        _layout : {
+          type: Array,
+          computed: '_computeLayout(_dimensions, _height, spacing)'
+        }
+      },
+
+      observers: [
+        '_layoutChanged(_layout)',
+        '_widthChanged(_width, _totalWidth)'
+      ],
+
+      listeners: {
+        'iron-resize': '_onIronResize',
+        'dom-change': '_childNodesChanged'
+      },
+
+      attached: function() {
+        var boundHandler = this._childNodesChanged.bind(this);
+        this._observer = Polymer.dom(this.$.content).observeNodes(boundHandler);
+        this.async(this.notifyResize, 1);
+      },
+
+      detached: function() {
+        Polymer.dom(this.$.content).unobserveNodes(this._observer);
+      },
+
+      _childNodesChanged: function(e) {
+        this._height = this.clientHeight;
+        var nodes = this.getEffectiveChildren();
+        this._elements = nodes.filter(function(node) { return node.nodeType == Node.ELEMENT_NODE && node.tagName !== "TEMPLATE" });
+      },
+
+      get parent() {
+        if (this.parentNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+          return this.parentNode.host;
+        }
+        return this.parentNode;
+      },
+
+      _onIronResize: function() {
+        if (this._width) {
+          // throttle layout calculations after first one
+          this.debounce('resize', function(){
+            this._width = this.clientWidth;
+          }, 15);
+        } else {
+          this._width = this.clientWidth;
+        }
+      },
+
+      // get the dimensions from the elements
+      _computeDimensions(elements) {
+        return elements.map(function(node) { return { width: node.clientWidth, height: node.clientHeight, aspect: node.clientWidth / node.clientHeight }});
+      },
+
+      _computeLayout(dimensions, height, spacing) {
+        var left = 0;
+        return dimensions.map(function(dim) { 
+          var result = { left: left, width: Math.round(height * dim.aspect), height: height }
+          left += result.width + spacing;
+          return result;
+        });
+      },
+
+      _widthChanged(width, totalWidth) {
+        var min = -(totalWidth - width);
+        // if window has been resized, check x is still within range and adjust as necessary
+        if (this.x < min) {
+          this.x = min;
+        }
+
+        if (this._impetus) {
+          this._impetus.pause();
+        }
+        this._impetus = new Impetus({
+          source: this,
+          boundX: [min, 0],
+          boundY: [0, 0],
+          initialValues: [this.x, 0],
+          friction: this.friction,
+          update: this._positionChanged.bind(this)
+        });
+      },
+
+      _layoutChanged(layout) {
+        requestAnimationFrame(function() {
+          layout.forEach(function(position, i) {
+            var scaleX, scaleY, style;
+            var dimension = this._dimensions[i];
+            var aspect = dimension.aspect;
+            scaleX = position.width / dimension.width;
+            scaleY = position.height / dimension.height;
+            var transform = 'translate(' + position.left + 'px,0px) scale(' + scaleX.toFixed(6) + ',' + scaleY.toFixed(6) + ')';
+            var element = this._elements[i];
+            element.style.transform = transform;
+          }.bind(this));
+
+          var last = layout[layout.length - 1];
+          this._totalWidth = last.left + last.width;
+          this.$.container.style.width = this._totalWidth + 'px';
+          this.fire('rendered');
+
+          // remove loading style override which prevented animation of the initial layout
+          if (this.loading && layout.length > 0) {
+            this.async(function() { this.loading = false }, 1);
+          }
+        }.bind(this));
+      },
+
+      _positionChanged(x, y) {
+        if (this.x != x) {
+          this.x = x;
+          this.$.container.style.transform = 'translateX(' + x + 'px)';
+        }
+      }
+    });
+  </script>
+</dom-module>

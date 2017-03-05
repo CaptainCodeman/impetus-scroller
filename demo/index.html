@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>impetus-scroller demo</title>
+
+    <script src="../../TouchEmulator/touch-emulator.js"></script>
+    <script>
+      TouchEmulator();
+      // Define polyfills for features that our app depends on:
+      window.PolyPoly = {
+        features: []
+      };
+      ('IntersectionObserver' in window) || window.PolyPoly.features.push('IntersectionObserver');
+    </script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../lazy-img/lazy-img.html">
+    <link rel="import" href="../impetus-scroller.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+      impetus-scroller { height: 60px; }
+      a, img, lazy-img { display: block; cursor: pointer; }
+
+      lazy-img {
+        --lazy-img: {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        --lazy-img-loaded: {
+          opacity: 1;
+          transform: scale(1.0);
+          transition: opacity 1s ease-in-out, transform 0.5s ease-in-out;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vertical-section-container">
+      <h3>Scroller with &lt;img&gt; elements</h3>
+      <demo-snippet>
+        <template>
+          <impetus-scroller style="height:60px;">
+            <img src="14117348070_bbf190b521_m.jpg" width="240" height="163">
+            <img src="28738913666_d7f288ae25_m.jpg" width="240" height="180">
+            <img src="28808871375_dc652d8972_m.jpg" width="160" height="240">
+            <img src="31782510030_579cb5119a_m.jpg" width="240" height="179">
+            <img src="32039394161_2cfc04b72a_m.jpg" width="180" height="240">
+            <img src="32061810663_2249492d02_m.jpg" width="240" height="162">
+            <img src="32357716254_42aa3b0663_m.jpg" width="240" height="159">
+            <img src="28686254682_185a028e2e_m.jpg" width="159" height="240">
+            <img src="32260967565_7f88cb6a4c_m.jpg" width="240" height="171">
+            <img src="32186892504_d99b0ffc1e_m.jpg" width="240" height="159">
+            <img src="32363556052_87007c3440_m.jpg" width="240" height="158">
+            <img src="32400954515_cdb6b12bf2_m.jpg" width="158" height="240">
+            <img src="32873865786_1c825895f3_m.jpg" width="240" height="145">
+            <img src="33001221391_6afee89be5_m.jpg" width="240" height="159">
+            <img src="33186065675_95b54548da_m.jpg" width="240" height="120">
+          </impetus-scroller>
+        </template>
+      </demo-snippet>
+      
+      <h3>Scroller with &lt;lazy-img&gt; elements</h3>
+      <demo-snippet>
+        <template>
+          <impetus-scroller style="height:160px;">
+            <lazy-img src="14117348070_bbf190b521_m.jpg" style="width:240px;height:163px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="28738913666_d7f288ae25_m.jpg" style="width:240px;height:180px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="28808871375_dc652d8972_m.jpg" style="width:160px;height:240px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="31782510030_579cb5119a_m.jpg" style="width:240px;height:179px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32039394161_2cfc04b72a_m.jpg" style="width:180px;height:240px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32061810663_2249492d02_m.jpg" style="width:240px;height:162px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32357716254_42aa3b0663_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="28686254682_185a028e2e_m.jpg" style="width:159px;height:240px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32260967565_7f88cb6a4c_m.jpg" style="width:240px;height:171px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32186892504_d99b0ffc1e_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32363556052_87007c3440_m.jpg" style="width:240px;height:158px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32400954515_cdb6b12bf2_m.jpg" style="width:158px;height:240px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="32873865786_1c825895f3_m.jpg" style="width:240px;height:145px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="33001221391_6afee89be5_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
+            <lazy-img src="33186065675_95b54548da_m.jpg" style="width:240px;height:120px;" observe="impetus-scroller"></lazy-img>
+          </impetus-scroller>
+        </template>
+      </demo-snippet>
+
+      <h3>Larger images, full browser width</h3>
+      <impetus-scroller id="scroller" style="height:120px;margin:0 -22px -22px -22px;">
+        <lazy-img src="14117348070_bbf190b521_m.jpg" style="width:240px;height:163px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="28738913666_d7f288ae25_m.jpg" style="width:240px;height:180px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="28808871375_dc652d8972_m.jpg" style="width:160px;height:240px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="31782510030_579cb5119a_m.jpg" style="width:240px;height:179px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32039394161_2cfc04b72a_m.jpg" style="width:180px;height:240px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32061810663_2249492d02_m.jpg" style="width:240px;height:162px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32357716254_42aa3b0663_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="28686254682_185a028e2e_m.jpg" style="width:159px;height:240px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32260967565_7f88cb6a4c_m.jpg" style="width:240px;height:171px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32186892504_d99b0ffc1e_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32363556052_87007c3440_m.jpg" style="width:240px;height:158px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32400954515_cdb6b12bf2_m.jpg" style="width:158px;height:240px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="32873865786_1c825895f3_m.jpg" style="width:240px;height:145px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="33001221391_6afee89be5_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
+        <lazy-img src="33186065675_95b54548da_m.jpg" style="width:240px;height:120px;" observe="impetus-scroller"></lazy-img>
+      </impetus-scroller>    
+
+    </div>
+  </body>
+</html>
