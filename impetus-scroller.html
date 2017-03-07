@@ -7,7 +7,7 @@
 `impetus-scroller`
 Momentum scroller using impetus
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="impetus-scroller">
@@ -51,17 +51,19 @@ Momentum scroller using impetus
       ],
 
       properties: {
+        /** spacing (in px) between elements */
         spacing: {
           type: Number,
           value: 1
         },
 
+        /** impetus friction */
         friction: {
           type: Number,
           value: 0.96
         },
 
-        /* loading flag for initial render */
+        /** loading flag for initial render */
         loading: {
           type: Boolean,
           value: true,
@@ -69,6 +71,7 @@ Momentum scroller using impetus
           reflectToAttribute: true
         },
 
+        /** current position */
         x: {
           type: Number,
           value: 0
@@ -148,7 +151,7 @@ Momentum scroller using impetus
 
       _computeLayout(dimensions, height, spacing) {
         var left = 0;
-        return dimensions.map(function(dim) { 
+        return dimensions.map(function(dim) {
           var result = { left: left, width: Math.round(height * dim.aspect), height: height }
           left += result.width + spacing;
           return result;
@@ -156,23 +159,30 @@ Momentum scroller using impetus
       },
 
       _widthChanged(width, totalWidth) {
-        var min = -(totalWidth - width);
-        // if window has been resized, check x is still within range and adjust as necessary
-        if (this.x < min) {
-          this.x = min;
-        }
-
         if (this._impetus) {
           this._impetus.pause();
         }
-        this._impetus = new Impetus({
-          source: this,
-          boundX: [min, 0],
-          boundY: [0, 0],
-          initialValues: [this.x, 0],
-          friction: this.friction,
-          update: this._positionChanged.bind(this)
-        });
+
+        // only add impetus imput if the content is wider than the container
+        if (totalWidth > width) {
+          // if window has been resized, check x is still within range
+          // and adjust as necessary if it isn't
+          var min = -(totalWidth - width);
+          if (this.x < min) {
+            this.x = min;
+          }
+
+          this._impetus = new Impetus({
+            source: this,
+            boundX: [min, 0],
+            boundY: [0, this._height],
+            initialValues: [this.x, 0],
+            friction: this.friction,
+            update: this._positionChanged.bind(this)
+          });
+        } else {
+          this.x = 0;
+        }
       },
 
       _layoutChanged(layout) {

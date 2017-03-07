@@ -1,6 +1,6 @@
 {
   "name": "impetus-scroller",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Momentum scroller using impetus",
   "authors": [
     "Simon Green <simon@captaincodeman.com>"
@@ -28,7 +28,7 @@
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "lazy-img": "captaincodeman/lazy-img#^0.0.5",
+    "lazy-img": "captaincodeman/lazy-img#^0.0.7",
     "TouchEmulator": "hammer-touchemulator#^0.0.2"
   },
   "license": "MIT"
