@@ -19,12 +19,15 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
     <link rel="import" href="../../lazy-img/lazy-img.html">
     <link rel="import" href="../impetus-scroller.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
       impetus-scroller { height: 60px; }
       a, img, lazy-img { display: block; cursor: pointer; }
+      .nav { text-align: center; }
+      paper-icon-button { width: 64px; height: 64px; }
 
       lazy-img {
         --lazy-img: {
@@ -65,9 +68,10 @@
       </demo-snippet>
 
       <h3>Scroller with &lt;lazy-img&gt; elements</h3>
+      <p>selected-index used to set initial position and allow programmatic positioning.</p>
       <demo-snippet>
-        <template>
-          <impetus-scroller style="height:160px;">
+        <template is="dom-bind" id="nav">
+          <impetus-scroller style="height:160px;" selected-index="[[selected]]">
             <lazy-img src="14117348070_bbf190b521_m.jpg" style="width:240px;height:163px;" observe="impetus-scroller"></lazy-img>
             <lazy-img src="28738913666_d7f288ae25_m.jpg" style="width:240px;height:180px;" observe="impetus-scroller"></lazy-img>
             <lazy-img src="28808871375_dc652d8972_m.jpg" style="width:160px;height:240px;" observe="impetus-scroller"></lazy-img>
@@ -84,7 +88,26 @@
             <lazy-img src="33001221391_6afee89be5_m.jpg" style="width:240px;height:159px;" observe="impetus-scroller"></lazy-img>
             <lazy-img src="33186065675_95b54548da_m.jpg" style="width:240px;height:120px;" observe="impetus-scroller"></lazy-img>
           </impetus-scroller>
+          <div class="nav">
+            <paper-icon-button icon="chevron-left" noink on-click="prev"></paper-icon-button>
+            <paper-icon-button icon="chevron-right" noink on-click="next"></paper-icon-button>
+          </div>
         </template>
+        <script>
+          document.addEventListener('WebComponentsReady', function() {
+            nav.selected = 8;
+            nav.prev = function() {
+              if (this.selected > 0) {
+                this.selected--;
+              }
+            };
+            nav.next = function() {
+              if (this.selected < 14) {
+                this.selected++;
+              }
+            };
+          });
+        </script>
       </demo-snippet>
 
       <h3>Larger images, full browser width</h3>
@@ -105,7 +128,6 @@
         <lazy-img src="33001221391_6afee89be5_m.jpg" style="width:240px;height:159px;" observe="#scroller"></lazy-img>
         <lazy-img src="33186065675_95b54548da_m.jpg" style="width:240px;height:120px;" observe="#scroller"></lazy-img>
       </impetus-scroller>
-
     </div>
   </body>
 </html>

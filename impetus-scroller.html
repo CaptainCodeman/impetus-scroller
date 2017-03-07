@@ -77,6 +77,12 @@ Momentum scroller using impetus
           value: 0
         },
 
+        /** Index of selected item */
+        selectedIndex: {
+          type: Number,
+          observer: '_selectedIndexChanged'
+        },
+
         _width: {
           type: Number
         },
@@ -108,6 +114,28 @@ Momentum scroller using impetus
       listeners: {
         'iron-resize': '_onIronResize',
         'dom-change': '_childNodesChanged'
+      },
+
+      selectIndex: function(index) {
+        if (index < this._dimensions.length) {
+          this.selectedIndex = index;
+        }
+      },
+
+      _selectedIndexChanged: function(val) {
+        if (this.loading) return;
+
+        var x = this._positionForIndex();
+        this._positionChanged(x, 0);
+
+        // TODO: use element.animate() ...
+        var el = this.$.container;
+        el.style.transition = 'transform 0.5s ease-in-out';
+        this._positionChanged(x, 0);
+        el.addEventListener("transitionend", function(event) {
+          el.style.transition = '';
+          el.removeEventListener("transitionend", this);
+        }, false);
       },
 
       attached: function() {
@@ -167,6 +195,8 @@ Momentum scroller using impetus
         if (totalWidth > width) {
           // if window has been resized, check x is still within range
           // and adjust as necessary if it isn't
+
+          // TODO: adjust x so content is centered
           var min = -(totalWidth - width);
           if (this.x < min) {
             this.x = min;
@@ -201,16 +231,36 @@ Momentum scroller using impetus
           var last = layout[layout.length - 1];
           this._totalWidth = last.left + last.width;
           this.$.container.style.width = this._totalWidth + 'px';
-          this.fire('rendered');
 
-          // remove loading style override which prevented animation of the initial layout
           if (this.loading && layout.length > 0) {
+            // set initial position
+            if (this.selectedIndex) {
+              var x = this._positionForIndex();
+              this._positionChanged(x, 0);
+            }
+
+            // remove loading style override which prevented
+            // animation of the initial layout
             this.async(function() { this.loading = false }, 1);
           }
+
+          this.fire('rendered');
+
         }.bind(this));
       },
 
-      _positionChanged(x, y) {
+      _positionForIndex: function() {
+        if (this.selectedIndex >= this._layout.length) {
+          this.selectedIndex = this._layout.length - 1;
+        }
+        var item = this._layout[this.selectedIndex];
+        var x = item.left + item.width / 2 - this._width / 2;
+        if (x < 0) x = 0;
+        if (x > (this._totalWidth - this._width)) x = this._totalWidth - this._width;
+        return -x;
+      },
+
+      _positionChanged: function(x, y) {
         if (this.x != x) {
           this.x = x;
           this.$.container.style.transform = 'translateX(' + x + 'px)';
